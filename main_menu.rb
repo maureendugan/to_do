@@ -11,19 +11,32 @@ def help
   puts "\n\n"
 end
 
-def add_list
-  puts "Enter the name of your list"
-  list_name = gets.chomp
+def list(method, list_name)
+  case method
+  when "add"
+    add_list(list_name)
+  when "show"
+    show_list
+  when "del"
+    del_list(list_name)
+  end
+end
+
+def del_list(list_name)
+  @lists.delete(list_name)
+end
+
+def add_list(list_name)
   @lists[list_name] = List.new(list_name)
 end
 
 def show_list
-  print "|"
-  @lists.each { |key, list| print "|  #{list.title}  |" }
-  print "|\n"
-  puts "\n"
-
-  puts "Enter l to add a list or a list name to add tasks to that list"
+  puts ""
+  @lists.each do |key, list|
+    puts ">>  #{list.title}"
+    show_tasks(list.title)
+  end
+  puts ""
 end
 
 def add_task(list_name)
@@ -33,11 +46,7 @@ def add_task(list_name)
 end
 
 def show_tasks(list_name)
-  puts "#{list_name}:"
-  print "|"
-  @lists[list_name].tasks.each { |key, task| print "|  #{task.description}#{ if task.done? then ": done" else "      " end}|"}
-  print "|"
-  puts "\n"
+  @lists[list_name].tasks.each { |key, task| puts ">>>>   #{task.description}#{ if task.done? then "(done)" end}"}
 end
 
 def mark_task(list_name)
@@ -70,17 +79,17 @@ puts " ----------------------- "
 help
 loop do
   print "> "
-  input = gets.chomp
+  input = gets.chomp.split
 
-  case input
+  case input[0]
   when "?"
     help
   when "l"
-    add_list
+    list(input[1], input[2])
   when 'show'
     show_list
-  when if @lists.key?(input) then @lists[input].title end
-    list_name = input
+  when if @lists.key?(input[0]) then @lists[input[0]].title end
+    list_name = input[0]
     task_help
 
     loop do
